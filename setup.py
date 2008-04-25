@@ -5,7 +5,7 @@ version = '0.3'
 
 setup(name='chessmind.core',
       version=version,
-      description="Core Chessmind package",
+      description="Core ChessMind package",
       long_description=open("README.txt").read() + "\n" +
                        open(os.path.join("docs", "HISTORY.txt")).read(),
       # Get more strings from http://www.python.org/pypi?%3Aaction=list_classifiers
