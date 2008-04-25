@@ -1,0 +1,133 @@
+Notes for developers
+====================
+
+It can be difficult to grasp which methods are calling which other
+methods and why.  Where does the responsibility of one method end
+and where does that of the other begin?  You need to be careful that
+you do not cause loops where methods keep calling each other.
+Fortunately, running the tests should be enough to tell you that you
+made such an error.
+
+But some notes are in order, if only to keep myself sane. :)
+
+
+Board and pieces
+----------------
+
+Each piece (even an empty square) is an instance of a class that is
+defined in the file `piece.py`.  Each piece has some methods that
+can tell you which squares they can reach.  It is important to note
+that they assume that the board is empty.  For example, if you have a
+King on E4 and you ask him where he can go, he will give all eight
+squares around him as an answer.
+
+The board (class ChessBoard in `board.py`) is responsible for checking
+if all those moves can actually be made.
+
+A piece will give you a list of directions in which he can move.  Each
+direction itself is a list of squares, beginning with the square
+closest to the piece.
+
+This means that the board can try all moves in one direction, stop at
+the moment he encounters another piece with a move, and continue
+checking the next direction.
+
+
+Simple move
+-----------
+
+The method `move` is used to move a piece from start to target.
+
+- `validateMove` is called to check that the move is valid
+
+- The actual move is done, handling castling and en passant if
+  applicable.
+
+
+Validating moves
+----------------
+
+The method `validateMove` checks that a piece can move from start to
+target.
+
+- It does some sanity checking to make sure that empty squares cannot
+  move and things like that.
+
+- It calls the method `castlingMoves` to see if the intended move is
+  a castling move.  This is done early, because a move of a King from
+  E1 to C1 would raise an exception in other checks.
+
+- The piece is asked if, on an empty board, it could move from start
+  to target.  If not, an `ImpossibleMove` exception is raised
+
+- We check if the target is one of the squares return by the board
+  method `calcMovesForPiece`.
+
+- If not, we do one more check to see if the target is in the
+  `specialAttackMoves`, which can be the case if it is a pawn that
+  does an en passant.
+
+- If that also returns nothing, we raise an `ImpossibleMove` exception.
+
+
+Castling
+--------
+
+castlingMoves
+~~~~~~~~~~~~~
+
+In our definition, Rooks cannot perform castling moves.  The King
+takes the lead.
+
+- So we check if the start square is a King and is still capable of
+  castling (that is, he has not moved yet).
+
+- With CASTLE_PAIRS (a tuple of dictionaries) we have some relevant
+  squares for checking with the `castlingAllowed` method.
+
+- We return the possible end positions of the King after castling.
+
+
+castlingAllowed
+~~~~~~~~~~~~~~~
+
+- This calls `freePath` to see if there are no obstacles between King
+  and Rook.
+
+- If the King is in check on his current position, castling is not
+  allowed.  We call `isInCheck` for this.
+
+- On a copy of the current board we see if the King is in check when
+  moving to his final target or to the square in between, calling
+  `moveCausesCheck`.
+
+    def freePath(self, start, target):
+
+
+The recursion dragon
+--------------------
+
+So move calls validateMove, which calls castlingMoves, which calls
+castlingAllowed, which calls moveCausesCheck, which again calls move.
+So we have to watch out for recursion here.
+
+Another recursion that lies on the prowl is move, validateMove,
+calcMovesForPiece, moveCausesCheck, move.
+
+To prevent that, we use a trick.  When white tries a castling move,
+its King can never be hit by a castling move from black.  So we give
+several methods an optional argument include_castling, which is by
+default True but can be set to False in this case to prevent this
+recursion.
+
+
+    def isInCheck(self, ownColour):
+    def moveCausesCheck(self, start, target):
+
+
+    def findKing(self, ownColour):
+    def isAttacked(self, ownColour, square):
+    def _path(self, start, target):
+    def _safeMovesForPiece(self, start, include_castling=True):
+    def calcMovesForPiece(self, start, include_castling=True):
+    def specialAttackMoves(self, start):

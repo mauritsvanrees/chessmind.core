@@ -1,0 +1,26 @@
+Rules
+-----
+
+- recognize draw by three times the same position (not necessarily in
+  succession), with the same possible moves for each player.  So if
+  there is a difference in possible en passant or castling moves,
+  there is no draw.  Examples:
+  http://en.wikipedia.org/wiki/Threefold_repetition
+
+- recognize draw by fifty moves without attacks and without pawn
+  moves.  See:
+  http://en.wikipedia.org/wiki/Fifty_move_rule
+
+For the last two draws, these are not automatically draws, but only when a
+player claims it.  So the game can actually continue.
+
+
+Artificial intelligence
+-----------------------
+
+The only part of chessmind that could currently be called artificial
+intelligence is the hint function.  This is implemented rather silly.
+The AI part could use a good overhaul.  Specifically it probably does
+not need all the checks that the current code has.  It could just do a
+move and look what the consequences are, without doing a lot of the
+checking that is currently done to ensure that the move is legal.
