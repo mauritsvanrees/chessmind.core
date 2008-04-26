@@ -322,6 +322,10 @@ class King(Piece):
     >>> _unwantedMovesNotPossible(piece, start, unwanted)
     True
 
+    >>> start = 'B1'
+    >>> piece.possibleMoves(start)
+    [['A2'], ['B2'], ['C2'], ['C1'], ['A1']]
+
     """
 
     name = 'King'
@@ -360,7 +364,7 @@ class King(Piece):
             if col > 0:
                 directions.append([squarify(row-1, col-1)])
         # Try to move left
-        if col > 1:
+        if col > 0:
             directions.append([squarify(row, col-1)])
         return directions
 
