@@ -2,7 +2,8 @@ ROWS = 3
 COLS = 3
 CHESS_ROWS = 8
 CHESS_COLS = 8
-# XXX Add rows/cols for checkers here.
+CHECKERS_ROWS = 10
+CHECKERS_COLS = 10
 
 PLAIN = 0
 WHITE = 1
