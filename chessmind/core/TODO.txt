@@ -24,6 +24,3 @@ The AI part could use a good overhaul.  Specifically it probably does
 not need all the checks that the current code has.  It could just do a
 move and look what the consequences are, without doing a lot of the
 checking that is currently done to ensure that the move is legal.
-
-
-- Play with bazaar.
